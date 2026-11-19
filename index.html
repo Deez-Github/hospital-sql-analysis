@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hospital Admissions Analytics · SQL Server / T-SQL</title>
+<meta name="description" content="A SQL analytics case study of 10 hospital admissions: filtering, aggregation, CASE logic and joins in Microsoft SQL Server, with findings, charts and a query catalogue.">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#FBFAF7;color:#0B2027;font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:Georgia,"Iowan Old Style","Times New Roman",serif;font-weight:600;letter-spacing:-.01em;margin:0}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding:0 32px}
+
+/* nav */
+nav{border-bottom:1px solid #E5E3DB;background:#FBFAF7;position:sticky;top:0;z-index:20}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px;gap:24px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:14px;letter-spacing:.14em;text-transform:uppercase}
+.brand .mark{width:22px;height:22px;border-radius:6px;background:#147D7A;display:inline-block;position:relative}
+.brand .mark::after{content:"";position:absolute;inset:6px 6px auto 6px;height:2px;background:#FBFAF7;box-shadow:0 4px 0 #FBFAF7,0 8px 0 #FBFAF7}
+nav ul{display:flex;gap:26px;list-style:none;margin:0;padding:0;font-size:13.5px;color:#5C6B73}
+nav li a:hover{color:#147D7A}
+
+/* hero */
+.hero{background:#0B2027;color:#F7F6F1;padding:64px 0 88px;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-120px;top:-160px;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(20,125,122,.55),rgba(11,32,39,0) 68%)}
+.hero .wrap{position:relative;z-index:1;max-width:1180px}
+.eyebrow{font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:#E4B363;font-weight:700;margin-bottom:20px}
+.hero h1{font-size:clamp(34px,4.4vw,56px);line-height:1.08;max-width:15ch;color:#FFFFFF}
+.hero p.lede{max-width:62ch;color:#C6D3D4;font-size:17px;margin:22px 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
+.chip{border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:6px 14px;font-size:12.5px;color:#DDE7E7;background:rgba(255,255,255,.04)}
+
+/* kpis */
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-top:-46px;position:relative;z-index:2}
+.kpi{background:#fff;border:1px solid #E9E6DE;border-radius:12px;padding:20px 20px 18px;box-shadow:0 10px 30px rgba(11,32,39,.06)}
+.kpi .v{font-family:Georgia,serif;font-size:34px;line-height:1.1;font-weight:600}
+.kpi .v small{font-size:15px;color:#5C6B73;margin-left:3px}
+.kpi .k{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:#5C6B73;margin-top:10px;font-weight:600}
+.kpi .n{font-size:12px;color:#8A959A;margin-top:4px}
+.kpi.accent{background:#0F2E35;border-color:#0F2E35;color:#fff}
+.kpi.accent .k{color:#9CC2C1}
+.kpi.accent .n{color:#7E9B9C}
+
+/* sections */
+section{padding:72px 0 8px}
+.shead{display:flex;align-items:flex-end;justify-content:space-between;gap:32px;border-bottom:1px solid #E5E3DB;padding-bottom:18px;margin-bottom:36px}
+.shead .num{font-size:12px;letter-spacing:.18em;color:#147D7A;font-weight:700}
+.shead h2{font-size:30px;margin-top:6px}
+.shead p{max-width:46ch;color:#5C6B73;font-size:14.5px;margin:0;text-align:right}
+
+/* findings */
+.findings{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.finding{background:#fff;border:1px solid #E9E6DE;border-radius:14px;padding:26px 28px;display:grid;grid-template-columns:104px 1fr;gap:20px;align-items:start}
+.finding>div:last-child{display:flex;flex-direction:column;height:100%}
+.finding .big{font-family:Georgia,serif;font-size:40px;line-height:1;color:#147D7A;font-weight:600}
+.finding.coral .big{color:#D96C5F}
+.finding.gold .big{color:#C08A2E}
+.finding h3{font-size:18.5px;line-height:1.3;margin-bottom:8px}
+.finding p{margin:0;font-size:14px;color:#4A585F}
+.finding .tag{display:inline-block;margin-top:auto;padding-top:0;align-self:flex-start;font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:#147D7A;background:#E8F2F1;padding:4px 9px;border-radius:5px;font-weight:700}
+
+/* charts */
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.card{background:#fff;border:1px solid #E9E6DE;border-radius:14px;padding:26px 26px 18px;display:flex;flex-direction:column}
+.card h3,.card .sub,.card svg{flex:none}
+.card.wide{grid-column:1/-1}
+.card h3{font-size:17px}
+.card .sub{font-size:12.5px;color:#7A878D;margin:6px 0 16px}
+.card svg{width:100%;height:auto;display:block;overflow:visible}
+.card .note{font-size:12px;color:#7A878D;border-top:1px dashed #E5E3DB;padding-top:12px;margin-top:auto}
+
+/* tables */
+.tablewrap{background:#fff;border:1px solid #E9E6DE;border-radius:14px;overflow:hidden}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#F4F3EE;text-align:left;font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:#5C6B73;padding:12px 14px;font-weight:700;white-space:nowrap}
+td{padding:11px 14px;border-top:1px solid #EFEDE7;color:#34444B}
+tbody tr:hover{background:#FAFAF7}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+td.strong{font-weight:600;color:#0B2027}
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:600}
+.pill.gold{background:#FBF1DC;color:#96701F}
+.pill.teal{background:#E8F2F1;color:#147D7A}
+.two{display:grid;grid-template-columns:1.15fr .85fr;gap:22px;align-items:start}
+
+/* queries */
+.qgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.qcard{background:#fff;border:1px solid #E9E6DE;border-radius:14px;padding:22px 24px}
+.qhead{display:flex;gap:14px;align-items:flex-start;margin-bottom:14px}
+.qnum{font-family:Georgia,serif;font-size:22px;color:#147D7A;line-height:1;font-weight:600}
+.qcard h3{font-size:16px}
+.qcard .qhead p{margin:2px 0 0;font-size:11.5px;color:#7A878D}
+pre{margin:0;background:#0B2027;border-radius:10px;padding:16px 18px;overflow-x:auto}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;font-size:11.5px;line-height:1.7;color:#D8E4E3;white-space:pre}
+
+/* reproduce */
+.repro{background:#0F2E35;color:#DDE7E7;border-radius:16px;padding:36px 38px;margin:56px 0 0;display:grid;grid-template-columns:1fr 1.05fr;gap:36px;align-items:center}
+.repro h2{color:#fff;font-size:26px;margin-bottom:12px}
+.repro p{font-size:14px;color:#A9C0C1;margin:0 0 18px}
+.repro ol{margin:0;padding-left:18px;font-size:13.5px;color:#A9C0C1}
+.repro li{margin-bottom:7px}
+.repro pre{background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.08)}
+.repro code{color:#CFE3E2;font-size:12px}
+
+footer{margin-top:72px;border-top:1px solid #E5E3DB;padding:34px 0 48px;color:#7A878D;font-size:12.5px}
+footer .wrap{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap}
+
+@media(max-width:900px){
+ .kpis{grid-template-columns:repeat(2,1fr)}
+ .findings,.charts,.qgrid,.two{grid-template-columns:1fr}
+ .repro{grid-template-columns:1fr}
+ .shead{flex-direction:column;align-items:flex-start}
+ .shead p{text-align:left}
+ nav ul{display:none}
+ .wrap{padding:0 20px}
+}
+@media print{
+ nav{display:none}.hero{padding:32px 0 56px}.kpis{margin-top:20px}
+ section{padding:32px 0 8px;break-inside:avoid}
+ body{font-size:12px}.card{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<nav><div class="wrap">
+  <div class="brand"><span class="mark"></span>Hospital Analytics</div>
+  <ul>
+    <li><a href="#findings">Findings</a></li>
+    <li><a href="#visuals">Visuals</a></li>
+    <li><a href="#data">Data</a></li>
+    <li><a href="#queries">Query catalogue</a></li>
+    <li><a href="#reproduce">Reproduce</a></li>
+  </ul>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="eyebrow">SQL Server 17.0 · T-SQL · SSMS</div>
+  <h1>Hospital admissions, analysed in SQL</h1>
+  <p class="lede">A 10-admission teaching dataset taken end to end: schema design, primary and
+  foreign keys, filtering, aggregation, CASE banding and joins — then translated into
+  findings a hospital operations team could actually act on.</p>
+  <div class="chips">
+    <span class="chip">27 analytical queries</span>
+    <span class="chip">2 tables · 1 foreign key</span>
+    <span class="chip">5 reporting views</span>
+    <span class="chip">8 validation checks</span>
+    <span class="chip">January 2026 cohort</span>
+  </div>
+</div></header>
+
+<div class="wrap">
+  <div class="kpis">
+    <div class="kpi accent"><div class="v">10</div><div class="k">Admissions</div><div class="n">Jan 5 – Jan 27, 2026</div></div>
+    <div class="kpi"><div class="v">44.6<small>yrs</small></div><div class="k">Average age</div><div class="n">median 41.5 · range 23–68</div></div>
+    <div class="kpi"><div class="v">4.4<small>days</small></div><div class="k">Average stay</div><div class="n">median 4 · max 8 days</div></div>
+    <div class="kpi"><div class="v">44<small>bed-days</small></div><div class="k">Total occupancy</div><div class="n">34 from long-stay cases</div></div>
+    <div class="kpi"><div class="v">2.2<small>×</small></div><div class="k">Scheduled vs emergency</div><div class="n">6.5 d vs 3.0 d average</div></div>
+  </div>
+</div>
+
+<section id="findings"><div class="wrap">
+  <div class="shead">
+    <div><div class="num">01 — FINDINGS</div><h2>Five things the data says</h2></div>
+    <p>Every figure below is produced by the queries in <code style="background:none;color:#147D7A;font-family:inherit">/sql</code> and reproduced in <code style="background:none;color:#147D7A;font-family:inherit">analysis/results.json</code>.</p>
+  </div>
+  <div class="findings">
+    <article class="finding coral"><div class="big">6.5d</div><div>
+      <h3>Scheduled admissions stay more than twice as long as emergencies</h3>
+      <p>Scheduled cases average 6.5 days against 3.0 for emergencies. With only four
+      scheduled admissions they still generate 26 of the 44 bed-days — 59% of total
+      occupancy from 40% of the caseload.</p>
+      <span class="tag">Capacity planning</span></div></article>
+
+    <article class="finding gold"><div class="big">77%</div><div>
+      <h3>Six long-stay patients consume three quarters of all bed-days</h3>
+      <p>Using the ≤3-day / &gt;3-day rule, 6 patients are long stay and account for 34 of
+      44 bed-days. Length of stay, not admission volume, is the lever that moves
+      occupancy in this dataset.</p>
+      <span class="tag">Resource use</span></div></article>
+
+    <article class="finding"><div class="big">30%</div><div>
+      <h3>Lagos is the catchment, but seven cities send one patient each</h3>
+      <p>3 of 10 admissions come from Lagos; the remaining 7 are spread across Abuja,
+      Kano, Accra, Ibadan, Enugu, Kaduna and Port Harcourt. Geographic concentration
+      matters more than city count when planning referral capacity.</p>
+      <span class="tag">Catchment</span></div></article>
+
+    <article class="finding"><div class="big">7.5d</div><div>
+      <h3>Patients aged 60+ stay twice as long on average</h3>
+      <p>Seniors average 7.5 days versus 3.5 for under-40s and 3.75 for the 40–59 band.
+      Only two patients fall in the senior group, so this is a signal to test on a
+      larger extract rather than a conclusion.</p>
+      <span class="tag">Age banding · small n</span></div></article>
+
+    <article class="finding"><div class="big">4</div><div>
+      <h3>One physician carries 40% of the panel and the longest average stay</h3>
+      <p>Dr. Ade (General Medicine) treats 4 patients for 20 bed-days and a 5.0-day
+      average; Dr. Musa (Internal Medicine) sees 3 with the shortest average stay at
+      3.67 days. Panel balance is worth reviewing as volume grows.</p>
+      <span class="tag">Workforce</span></div></article>
+
+    <article class="finding"><div class="big">2</div><div>
+      <h3>Case mix is perfectly flat — every condition appears twice</h3>
+      <p>Malaria, Typhoid, Hypertension, Diabetes and Asthma each affect exactly two
+      patients, so <code style="background:none;font-family:inherit;color:#147D7A">HAVING COUNT(*) &gt; 1</code>
+      returns the full list. Condition-level comparison is therefore illustrative, not
+      statistically meaningful.</p>
+      <span class="tag">Data limitation</span></div></article>
+  </div>
+</div></section>
+
+<section id="visuals"><div class="wrap">
+  <div class="shead">
+    <div><div class="num">02 — VISUALS</div><h2>What the queries look like as charts</h2></div>
+    <p>Rendered as inline SVG from the same result set — no chart library, no external
+    requests, prints cleanly to PDF.</p>
+  </div>
+  <div class="charts">
+    <div class="card"><h3>Admission channel drives length of stay</h3>
+      <div class="sub">Average length of stay · days</div>
+      <svg viewBox="0 0 640 300" role="img" aria-label="Average length of stay by admission type" preserveAspectRatio="xMidYMid meet" ><line x1="70" y1="250" x2="610" y2="250" stroke="#E1E6E4" stroke-width="1"/><line x1="70" y1="194.0" x2="610" y2="194.0" stroke="#E1E6E4" stroke-width="1" stroke-dasharray="2 4"/><text x="62.0" y="198.0" font-size="11" fill="#5C6B73" font-weight="400" text-anchor="end" class="" style="">2</text><line x1="70" y1="138.0" x2="610" y2="138.0" stroke="#E1E6E4" stroke-width="1" stroke-dasharray="2 4"/><text x="62.0" y="142.0" font-size="11" fill="#5C6B73" font-weight="400" text-anchor="end" class="" style="">4</text><line x1="70" y1="82.0" x2="610" y2="82.0" stroke="#E1E6E4" stroke-width="1" stroke-dasharray="2 4"/><text x="62.0" y="86.0" font-size="11" fill="#5C6B73" font-weight="400" text-anchor="end" class="" style="">6</text><rect x="190" y="166.0" width="104" height="84.0" rx="4" fill="#D96C5F"/><text x="242.0" y="154.0" font-size="26" fill="#0B2027" font-weight="700" text-anchor="middle" class="" style="">3.0</text><text x="242.0" y="132.0" font-size="11" fill="#5C6B73" font-weight="400" text-anchor="middle" class="" style="">days</text><text x="242.0" y="274.0" font-size="13" fill="#0B2027" font-weight="600" text-anchor="middle" class="" style="">Emergency</text><text x="242.0" y="292.0" font-size="11" fill="#5C6B73" font-weight="400" text-anchor="middle" class="" style="">6 admissions</text><rect x="340" y="68.0" width="104" height="182.0" rx="4" fill="#147D7A"/><text x="392.0" y="56.0" font-size="26" fill="#0B2027" font-weight="700" text-anchor="middle" class="" style="">6.5</text><text x="392.0" y="34.0" font-size="11" fill="#5C6B73" font-weight="400" text-anchor="middle" class="" style="">days</text><text x="392.0" y="274.0" font-size="13" fill="#0B2027" font-weight="600" text-anchor="middle" class="" style="">Scheduled</text><text x="392.0" y="292.0" font-size="11" fill="#5C6B73" font-weight="400" text-anchor="middle" class="" style="">4 admissions</text><line x1="70" y1="138.0" x2="610" y2="138.0" stroke="#E4B363" stroke-width="1.6" stroke-dasharray="7 5"/><text x="606.0" y="129.0" font-size="11" fill="#A8791E" font-weight="600" text-anchor="end" class="" style="">HAVING &gt; 4 days</text><text x="70.0" y="26.0" font-size="11" fill="#5C6B73" font-weight="400" text-anchor="start" class="" style="">Average length of stay (days)</text></svg>
+      <div class="note">The <code style="background:none;color:#147D7A;font-family:inherit">HAVING AVG(...) &gt; 4</code> filter returns Scheduled only — the single most useful query in the set.</div></div>
+
+    <div class="card"><h3>Patient catchment by city</h3>
+      <div class="sub">Admissions per city · 8 cities</div>
+      <svg viewBox="0 0 640 332" role="img" aria-label="Patients by city" preserveAspectRatio="xMidYMid meet" ><text x="112.0" y="40.0" font-size="12.5" fill="#0B2027" font-weight="600" text-anchor="end" class="" style="">Lagos</text><rect x="122" y="28" width="430" height="20" rx="3" fill="#F1F3F2"/><rect x="122" y="28" width="420.0" height="20" rx="3" fill="#E4B363"/><text x="551.0" y="43.0" font-size="12.5" fill="#0B2027" font-weight="700" text-anchor="start" class="" style="">3</text><text x="112.0" y="74.0" font-size="12.5" fill="#0B2027" font-weight="400" text-anchor="end" class="" style="">Abuja</text><rect x="122" y="62" width="430" height="20" rx="3" fill="#F1F3F2"/><rect x="122" y="62" width="140.0" height="20" rx="3" fill="#5FB3AE"/><text x="271.0" y="77.0" font-size="12.5" fill="#0B2027" font-weight="700" text-anchor="start" class="" style="">1</text><text x="112.0" y="108.0" font-size="12.5" fill="#0B2027" font-weight="400" text-anchor="end" class="" style="">Accra</text><rect x="122" y="96" width="430" height="20" rx="3" fill="#F1F3F2"/><rect x="122" y="96" width="140.0" height="20" rx="3" fill="#5FB3AE"/><text x="271.0" y="111.0" font-size="12.5" fill="#0B2027" font-weight="700" text-anchor="start" class="" style="">1</text><text x="112.0" y="142.0" font-size="12.5" fill="#0B2027" font-weight="400" text-anchor="end" class="" style="">Enugu</text><rect x="122" y="130" width="430" height="20" rx="3" fill="#F1F3F2"/><rect x="122" y="130" width="140.0" height="20" rx="3" fill="#5FB3AE"/><text x="271.0" y="145.0" font-size="12.5" fill="#0B2027" font-weight="700" text-anchor="start" class="" style="">1</text><text x="112.0" y="176.0" font-size="12.5" fill="#0B2027" font-weight="400" text-anchor="end" class="" style="">Ibadan</text><rect x="122" y="164" width="430" height="20" rx="3" fill="#F1F3F2"/><rect x="122" y="164" width="140.0" height="20" rx="3" fill="#5FB3AE"/><text x="271.0" y="179.0" font-size="12.5" fill="#0B2027" font-weight="700" text-anchor="start" class="" style="">1</text><text x="112.0" y="210.0" font-size="12.5" fill="#0B2027" font-weight="400" text-anchor="end" class="" style="">Kaduna</text><rect x="122" y="198" width="430" height="20" rx="3" fill="#F1F3F2"/><rect x="122" y="198" width="140.0" height="20" rx="3" fill="#5FB3AE"/><text x="271.0" y="213.0" font-size="12.5" fill="#0B2027" font-weight="700" text-anchor="start" class="" style="">1</text><text x="112.0" y="244.0" font-size="12.5" fill="#0B2027" font-weight="400" text-anchor="end" class="" style="">Kano</text><rect x="122" y="232" width="430" height="20" rx="3" fill="#F1F3F2"/><rect x="122" y="232" width="140.0" height="20" rx="3" fill="#5FB3AE"/><text x="271.0" y="247.0" font-size="12.5" fill="#0B2027" font-weight="700" text-anchor="start" class="" style="">1</text><text x="112.0" y="278.0" font-size="12.5" fill="#0B2027" font-weight="400" text-anchor="end" class="" style="">Port Harcourt</text><rect x="122" y="266" width="430" height="20" rx="3" fill="#F1F3F2"/><rect x="122" y="266" width="140.0" height="20" rx="3" fill="#5FB3AE"/><text x="271.0" y="281.0" font-size="12.5" fill="#0B2027" font-weight="700" text-anchor="start" class="" style="">1</text><text x="122.0" y="324.0" font-size="11" fill="#5C6B73" font-weight="400" text-anchor="start" class="" style="">8 cities  ·  Lagos holds 30% of the caseload</text></svg>
+      <div class="note">Highlighted bar: Lagos is the only city with more than one admission.</div></div>
+
+    <div class="card"><h3>Age bands</h3>
+      <div class="sub">CASE-based classification · 4 / 4 / 2</div>
+      <svg viewBox="0 0 640 250" role="img" aria-label="Age group distribution" preserveAspectRatio="xMidYMid meet" ><circle cx="118" cy="122" r="74" fill="none" stroke="#F1F3F2" stroke-width="30"/><circle cx="118" cy="122" r="74" fill="none" stroke="#147D7A" stroke-width="30" stroke-dasharray="182.98 281.97" stroke-dashoffset="-0.00" transform="rotate(-90 118 122)" stroke-linecap="butt"><title>Young: 4 patients</title></circle><circle cx="118" cy="122" r="74" fill="none" stroke="#E4B363" stroke-width="30" stroke-dasharray="182.98 281.97" stroke-dashoffset="-185.98" transform="rotate(-90 118 122)" stroke-linecap="butt"><title>Middle-aged: 4 patients</title></circle><circle cx="118" cy="122" r="74" fill="none" stroke="#D96C5F" stroke-width="30" stroke-dasharray="89.99 374.96" stroke-dashoffset="-371.96" transform="rotate(-90 118 122)" stroke-linecap="butt"><title>Senior: 2 patients</title></circle><text x="118.0" y="126.0" font-size="30" fill="#0B2027" font-weight="700" text-anchor="middle" class="" style="">10</text><text x="118.0" y="146.0" font-size="11" fill="#5C6B73" font-weight="400" text-anchor="middle" class="" style="">patients</text><rect x="238" y="47" width="11" height="11" rx="3" fill="#147D7A"/><text x="258.0" y="58.0" font-size="13" fill="#0B2027" font-weight="600" text-anchor="start" class="" style="">Young</text><text x="258.0" y="76.0" font-size="11" fill="#5C6B73" font-weight="400" text-anchor="start" class="" style="">4 patients · 40% · avg 3.5 d stay</text><rect x="238" y="93" width="11" height="11" rx="3" fill="#E4B363"/><text x="258.0" y="104.0" font-size="13" fill="#0B2027" font-weight="600" text-anchor="start" class="" style="">Middle-aged</text><text x="258.0" y="122.0" font-size="11" fill="#5C6B73" font-weight="400" text-anchor="start" class="" style="">4 patients · 40% · avg 3.8 d stay</text><rect x="238" y="139" width="11" height="11" rx="3" fill="#D96C5F"/><text x="258.0" y="150.0" font-size="13" fill="#0B2027" font-weight="600" text-anchor="start" class="" style="">Senior</text><text x="258.0" y="168.0" font-size="11" fill="#5C6B73" font-weight="400" text-anchor="start" class="" style="">2 patients · 20% · avg 7.5 d stay</text></svg>
+      <div class="note">Age bands follow the brief: Young &lt; 40, Middle-aged 40–59, Senior 60+.</div></div>
+
+    <div class="card"><h3>Case mix</h3>
+      <div class="sub">Patients per condition, with average stay</div>
+      <svg viewBox="0 0 640 226" role="img" aria-label="Patients per medical condition" preserveAspectRatio="xMidYMid meet" ><line x1="54" y1="178" x2="614" y2="178" stroke="#E1E6E4"/><rect x="70" y="67.2" width="62" height="110.8" rx="3" fill="#147D7A"/><text x="101.0" y="58.2" font-size="15" fill="#0B2027" font-weight="700" text-anchor="middle" class="" style="">2</text><text x="101.0" y="198.0" font-size="11.5" fill="#0B2027" font-weight="600" text-anchor="middle" class="" style="">Asthma</text><text x="101.0" y="215.0" font-size="10.5" fill="#5C6B73" font-weight="400" text-anchor="middle" class="" style="">2.0 d avg</text><rect x="166" y="67.2" width="62" height="110.8" rx="3" fill="#147D7A"/><text x="197.0" y="58.2" font-size="15" fill="#0B2027" font-weight="700" text-anchor="middle" class="" style="">2</text><text x="197.0" y="198.0" font-size="11.5" fill="#0B2027" font-weight="600" text-anchor="middle" class="" style="">Diabetes</text><text x="197.0" y="215.0" font-size="10.5" fill="#5C6B73" font-weight="400" text-anchor="middle" class="" style="">6.5 d avg</text><rect x="262" y="67.2" width="62" height="110.8" rx="3" fill="#147D7A"/><text x="293.0" y="58.2" font-size="15" fill="#0B2027" font-weight="700" text-anchor="middle" class="" style="">2</text><text x="293.0" y="198.0" font-size="11.5" fill="#0B2027" font-weight="600" text-anchor="middle" class="" style="">Hypertension</text><text x="293.0" y="215.0" font-size="10.5" fill="#5C6B73" font-weight="400" text-anchor="middle" class="" style="">6.5 d avg</text><rect x="358" y="67.2" width="62" height="110.8" rx="3" fill="#147D7A"/><text x="389.0" y="58.2" font-size="15" fill="#0B2027" font-weight="700" text-anchor="middle" class="" style="">2</text><text x="389.0" y="198.0" font-size="11.5" fill="#0B2027" font-weight="600" text-anchor="middle" class="" style="">Malaria</text><text x="389.0" y="215.0" font-size="10.5" fill="#5C6B73" font-weight="400" text-anchor="middle" class="" style="">3.0 d avg</text><rect x="454" y="67.2" width="62" height="110.8" rx="3" fill="#147D7A"/><text x="485.0" y="58.2" font-size="15" fill="#0B2027" font-weight="700" text-anchor="middle" class="" style="">2</text><text x="485.0" y="198.0" font-size="11.5" fill="#0B2027" font-weight="600" text-anchor="middle" class="" style="">Typhoid</text><text x="485.0" y="215.0" font-size="10.5" fill="#5C6B73" font-weight="400" text-anchor="middle" class="" style="">4.0 d avg</text><text x="54.0" y="24.0" font-size="11" fill="#5C6B73" font-weight="400" text-anchor="start" class="" style="">Patients per condition (all equal 2 · HAVING &gt; 1 returns all five)</text></svg>
+      <div class="note">Diabetes and Hypertension carry the longest average stays at 6.5 days.</div></div>
+
+    <div class="card"><h3>Physician workload</h3>
+      <div class="sub">Patients treated · bed-days · average stay</div>
+      <svg viewBox="0 0 640 250" role="img" aria-label="Workload and average stay per physician" preserveAspectRatio="xMidYMid meet" ><line x1="66" y1="190" x2="612" y2="190" stroke="#E1E6E4"/><line x1="66" y1="124.8" x2="612" y2="124.8" stroke="#E1E6E4" stroke-dasharray="2 4"/><text x="58.0" y="128.8" font-size="10.5" fill="#5C6B73" font-weight="400" text-anchor="end" class="" style="">2</text><line x1="66" y1="59.6" x2="612" y2="59.6" stroke="#E1E6E4" stroke-dasharray="2 4"/><text x="58.0" y="63.6" font-size="10.5" fill="#5C6B73" font-weight="400" text-anchor="end" class="" style="">4</text><rect x="96" y="59.6" width="74" height="130.4" rx="3" fill="#147D7A" opacity="1"/><text x="133.0" y="50.6" font-size="16" fill="#0B2027" font-weight="700" text-anchor="middle" class="" style="">4</text><text x="133.0" y="210.0" font-size="12" fill="#0B2027" font-weight="600" text-anchor="middle" class="" style="">Dr. Ade</text><text x="133.0" y="226.0" font-size="10" fill="#5C6B73" font-weight="400" text-anchor="middle" class="" style="">General Medicine</text><text x="133.0" y="242.0" font-size="10" fill="#5C6B73" font-weight="400" text-anchor="middle" class="" style="">20 bed-days · 5.0 d avg</text><rect x="274" y="92.2" width="74" height="97.8" rx="3" fill="#147D7A" opacity="0.82"/><text x="311.0" y="83.2" font-size="16" fill="#0B2027" font-weight="700" text-anchor="middle" class="" style="">3</text><text x="311.0" y="210.0" font-size="12" fill="#0B2027" font-weight="600" text-anchor="middle" class="" style="">Dr. Bello</text><text x="311.0" y="226.0" font-size="10" fill="#5C6B73" font-weight="400" text-anchor="middle" class="" style="">Family Medicine</text><text x="311.0" y="242.0" font-size="10" fill="#5C6B73" font-weight="400" text-anchor="middle" class="" style="">13 bed-days · 4.3 d avg</text><rect x="452" y="92.2" width="74" height="97.8" rx="3" fill="#147D7A" opacity="0.82"/><text x="489.0" y="83.2" font-size="16" fill="#0B2027" font-weight="700" text-anchor="middle" class="" style="">3</text><text x="489.0" y="210.0" font-size="12" fill="#0B2027" font-weight="600" text-anchor="middle" class="" style="">Dr. Musa</text><text x="489.0" y="226.0" font-size="10" fill="#5C6B73" font-weight="400" text-anchor="middle" class="" style="">Internal Medicine</text><text x="489.0" y="242.0" font-size="10" fill="#5C6B73" font-weight="400" text-anchor="middle" class="" style="">11 bed-days · 3.7 d avg</text><text x="66.0" y="24.0" font-size="11" fill="#5C6B73" font-weight="400" text-anchor="start" class="" style="">Patients treated per physician</text></svg>
+      <div class="note">INNER JOIN on Doctor_ID — every admission resolves to a valid physician.</div></div>
+
+    <div class="card"><h3>Admission timeline</h3>
+      <div class="sub">One point per admission · height = length of stay</div>
+      <svg viewBox="0 0 640 232" role="img" aria-label="Admission timeline" preserveAspectRatio="xMidYMid meet" ><line x1="78" y1="200" x2="604" y2="200" stroke="#E1E6E4"/><line x1="78" y1="164.4" x2="604" y2="164.4" stroke="#E1E6E4" stroke-dasharray="2 4"/><text x="69.0" y="168.4" font-size="10.5" fill="#5C6B73" font-weight="400" text-anchor="end" class="" style="">2</text><line x1="78" y1="128.9" x2="604" y2="128.9" stroke="#E1E6E4" stroke-dasharray="2 4"/><text x="69.0" y="132.9" font-size="10.5" fill="#5C6B73" font-weight="400" text-anchor="end" class="" style="">4</text><line x1="78" y1="93.3" x2="604" y2="93.3" stroke="#E1E6E4" stroke-dasharray="2 4"/><text x="69.0" y="97.3" font-size="10.5" fill="#5C6B73" font-weight="400" text-anchor="end" class="" style="">6</text><line x1="78" y1="57.8" x2="604" y2="57.8" stroke="#E1E6E4" stroke-dasharray="2 4"/><text x="69.0" y="61.8" font-size="10.5" fill="#5C6B73" font-weight="400" text-anchor="end" class="" style="">8</text><line x1="78.0" y1="200" x2="78.0" y2="205" stroke="#E1E6E4"/><text x="78.0" y="221.0" font-size="10.5" fill="#5C6B73" font-weight="400" text-anchor="middle" class="" style="">1 Jan</text><line x1="235.8" y1="200" x2="235.8" y2="205" stroke="#E1E6E4"/><text x="235.8" y="221.0" font-size="10.5" fill="#5C6B73" font-weight="400" text-anchor="middle" class="" style="">10 Jan</text><line x1="411.1" y1="200" x2="411.1" y2="205" stroke="#E1E6E4"/><text x="411.1" y="221.0" font-size="10.5" fill="#5C6B73" font-weight="400" text-anchor="middle" class="" style="">20 Jan</text><line x1="586.5" y1="200" x2="586.5" y2="205" stroke="#E1E6E4"/><text x="586.5" y="221.0" font-size="10.5" fill="#5C6B73" font-weight="400" text-anchor="middle" class="" style="">30 Jan</text><line x1="148.1" y1="200" x2="148.1" y2="146.7" stroke="#D96C5F" stroke-width="1.6" opacity="0.35"/><circle cx="148.1" cy="146.7" r="5.5" fill="#D96C5F" stroke="#fff" stroke-width="1.6"><title>Aisha Bello · 3 days · Emergency</title></circle><text x="148.1" y="134.7" font-size="10.5" fill="#0B2027" font-weight="700" text-anchor="middle" class="" style="">3</text><line x1="183.2" y1="200" x2="183.2" y2="111.1" stroke="#147D7A" stroke-width="1.6" opacity="0.35"/><circle cx="183.2" cy="111.1" r="5.5" fill="#147D7A" stroke="#fff" stroke-width="1.6"><title>Chinedu Okafor · 5 days · Scheduled</title></circle><text x="183.2" y="99.1" font-size="10.5" fill="#0B2027" font-weight="700" text-anchor="middle" class="" style="">5</text><line x1="235.8" y1="200" x2="235.8" y2="128.9" stroke="#D96C5F" stroke-width="1.6" opacity="0.35"/><circle cx="235.8" cy="128.9" r="5.5" fill="#D96C5F" stroke="#fff" stroke-width="1.6"><title>Fatima Yusuf · 4 days · Emergency</title></circle><text x="235.8" y="116.9" font-size="10.5" fill="#0B2027" font-weight="700" text-anchor="middle" class="" style="">4</text><line x1="270.9" y1="200" x2="270.9" y2="75.6" stroke="#147D7A" stroke-width="1.6" opacity="0.35"/><circle cx="270.9" cy="75.6" r="5.5" fill="#147D7A" stroke="#fff" stroke-width="1.6"><title>David Mensah · 7 days · Scheduled</title></circle><text x="270.9" y="63.6" font-size="10.5" fill="#0B2027" font-weight="700" text-anchor="middle" class="" style="">7</text><line x1="323.5" y1="200" x2="323.5" y2="164.4" stroke="#D96C5F" stroke-width="1.6" opacity="0.35"/><circle cx="323.5" cy="164.4" r="5.5" fill="#D96C5F" stroke="#fff" stroke-width="1.6"><title>Zainab Ali · 2 days · Emergency</title></circle><text x="323.5" y="152.4" font-size="10.5" fill="#0B2027" font-weight="700" text-anchor="middle" class="" style="">2</text><line x1="376.1" y1="200" x2="376.1" y2="146.7" stroke="#D96C5F" stroke-width="1.6" opacity="0.35"/><circle cx="376.1" cy="146.7" r="5.5" fill="#D96C5F" stroke="#fff" stroke-width="1.6"><title>Tunde Adeyemi · 3 days · Emergency</title></circle><text x="376.1" y="134.7" font-size="10.5" fill="#0B2027" font-weight="700" text-anchor="middle" class="" style="">3</text><line x1="411.1" y1="200" x2="411.1" y2="57.8" stroke="#147D7A" stroke-width="1.6" opacity="0.35"/><circle cx="411.1" cy="57.8" r="5.5" fill="#147D7A" stroke="#fff" stroke-width="1.6"><title>Grace Eze · 8 days · Scheduled</title></circle><text x="411.1" y="45.8" font-size="10.5" fill="#0B2027" font-weight="700" text-anchor="middle" class="" style="">8</text><line x1="446.2" y1="200" x2="446.2" y2="128.9" stroke="#D96C5F" stroke-width="1.6" opacity="0.35"/><circle cx="446.2" cy="128.9" r="5.5" fill="#D96C5F" stroke="#fff" stroke-width="1.6"><title>Ibrahim Musa · 4 days · Emergency</title></circle><text x="446.2" y="116.9" font-size="10.5" fill="#0B2027" font-weight="700" text-anchor="middle" class="" style="">4</text><line x1="481.3" y1="200" x2="481.3" y2="93.3" stroke="#147D7A" stroke-width="1.6" opacity="0.35"/><circle cx="481.3" cy="93.3" r="5.5" fill="#147D7A" stroke="#fff" stroke-width="1.6"><title>Mary Johnson · 6 days · Scheduled</title></circle><text x="481.3" y="81.3" font-size="10.5" fill="#0B2027" font-weight="700" text-anchor="middle" class="" style="">6</text><line x1="533.9" y1="200" x2="533.9" y2="164.4" stroke="#D96C5F" stroke-width="1.6" opacity="0.35"/><circle cx="533.9" cy="164.4" r="5.5" fill="#D96C5F" stroke="#fff" stroke-width="1.6"><title>Samuel Obi · 2 days · Emergency</title></circle><text x="533.9" y="152.4" font-size="10.5" fill="#0B2027" font-weight="700" text-anchor="middle" class="" style="">2</text><text x="78.0" y="24.0" font-size="11" fill="#5C6B73" font-weight="400" text-anchor="start" class="" style="">Length of stay (days) by admission date — January 2026</text><circle cx="454" cy="16" r="4.5" fill="#D96C5F"/><text x="464.0" y="20.0" font-size="10.5" fill="#5C6B73" font-weight="400" text-anchor="start" class="" style="">Emergency</text><circle cx="542" cy="16" r="4.5" fill="#147D7A"/><text x="552.0" y="20.0" font-size="10.5" fill="#5C6B73" font-weight="400" text-anchor="start" class="" style="">Scheduled</text></svg>
+      <div class="note">The two longest stays (8 and 7 days) both belong to scheduled admissions.</div></div>
+
+    <div class="card wide"><h3>Length-of-stay distribution</h3>
+      <div class="sub">Patients by exact stay length · the ≤3 / &gt;3 day split</div>
+      <svg viewBox="0 0 640 236" role="img" aria-label="Patients by length of stay" preserveAspectRatio="xMidYMid meet" ><line x1="66" y1="180" x2="600" y2="180" stroke="#E1E6E4"/><rect x="84" y="67.7" width="46" height="112.3" rx="3" fill="#E4B363"><title>2 days: 2 patients</title></rect><text x="107.0" y="59.7" font-size="12" fill="#0B2027" font-weight="700" text-anchor="middle" class="" style="">2</text><text x="107.0" y="200.0" font-size="11.5" fill="#0B2027" font-weight="600" text-anchor="middle" class="" style="">2</text><rect x="150" y="67.7" width="46" height="112.3" rx="3" fill="#E4B363"><title>3 days: 2 patients</title></rect><text x="173.0" y="59.7" font-size="12" fill="#0B2027" font-weight="700" text-anchor="middle" class="" style="">2</text><text x="173.0" y="200.0" font-size="11.5" fill="#0B2027" font-weight="600" text-anchor="middle" class="" style="">3</text><rect x="216" y="67.7" width="46" height="112.3" rx="3" fill="#147D7A"><title>4 days: 2 patients</title></rect><text x="239.0" y="59.7" font-size="12" fill="#0B2027" font-weight="700" text-anchor="middle" class="" style="">2</text><text x="239.0" y="200.0" font-size="11.5" fill="#0B2027" font-weight="600" text-anchor="middle" class="" style="">4</text><rect x="282" y="123.8" width="46" height="56.2" rx="3" fill="#147D7A"><title>5 days: 1 patients</title></rect><text x="305.0" y="115.8" font-size="12" fill="#0B2027" font-weight="700" text-anchor="middle" class="" style="">1</text><text x="305.0" y="200.0" font-size="11.5" fill="#0B2027" font-weight="600" text-anchor="middle" class="" style="">5</text><rect x="348" y="123.8" width="46" height="56.2" rx="3" fill="#147D7A"><title>6 days: 1 patients</title></rect><text x="371.0" y="115.8" font-size="12" fill="#0B2027" font-weight="700" text-anchor="middle" class="" style="">1</text><text x="371.0" y="200.0" font-size="11.5" fill="#0B2027" font-weight="600" text-anchor="middle" class="" style="">6</text><rect x="414" y="123.8" width="46" height="56.2" rx="3" fill="#147D7A"><title>7 days: 1 patients</title></rect><text x="437.0" y="115.8" font-size="12" fill="#0B2027" font-weight="700" text-anchor="middle" class="" style="">1</text><text x="437.0" y="200.0" font-size="11.5" fill="#0B2027" font-weight="600" text-anchor="middle" class="" style="">7</text><rect x="480" y="123.8" width="46" height="56.2" rx="3" fill="#147D7A"><title>8 days: 1 patients</title></rect><text x="503.0" y="115.8" font-size="12" fill="#0B2027" font-weight="700" text-anchor="middle" class="" style="">1</text><text x="503.0" y="200.0" font-size="11.5" fill="#0B2027" font-weight="600" text-anchor="middle" class="" style="">8</text><text x="263.0" y="222.0" font-size="10.5" fill="#5C6B73" font-weight="400" text-anchor="middle" class="" style="">length of stay (days)</text><text x="66.0" y="22.0" font-size="11" fill="#5C6B73" font-weight="400" text-anchor="start" class="" style="">Patients by length of stay</text></svg>
+      <div class="note">Stays cluster at 2–4 days with a long tail to 8 days; the distribution is bimodal enough to justify banding rather than averaging alone.</div></div>
+  </div>
+</div></section>
+
+<section id="data"><div class="wrap">
+  <div class="shead">
+    <div><div class="num">03 — DATA</div><h2>The register behind the numbers</h2></div>
+    <p>Ten admissions, three physicians, January 2026. Enriched with the same CASE
+    logic used in Task 4.</p>
+  </div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>ID</th><th>Patient</th><th>Age</th><th>Gender</th><th>City</th><th>Condition</th>
+      <th>Channel</th><th>Admitted</th><th>Stay</th><th>Band</th><th>Status</th></tr></thead>
+      <tbody><tr><td class="num">1</td><td class="strong">Aisha Bello</td><td class="num">34</td><td>Female</td><td>Lagos</td><td>Malaria</td><td>Emergency</td><td class="num">01-05</td><td class="num strong">3</td><td><span class="pill gold">Short Stay</span></td><td>Recovered</td></tr><tr><td class="num">2</td><td class="strong">Chinedu Okafor</td><td class="num">52</td><td>Male</td><td>Abuja</td><td>Hypertension</td><td>Scheduled</td><td class="num">01-07</td><td class="num strong">5</td><td><span class="pill teal">Long Stay</span></td><td>Recovering</td></tr><tr><td class="num">3</td><td class="strong">Fatima Yusuf</td><td class="num">27</td><td>Female</td><td>Kano</td><td>Typhoid</td><td>Emergency</td><td class="num">01-10</td><td class="num strong">4</td><td><span class="pill teal">Long Stay</span></td><td>Recovered</td></tr><tr><td class="num">4</td><td class="strong">David Mensah</td><td class="num">61</td><td>Male</td><td>Accra</td><td>Diabetes</td><td>Scheduled</td><td class="num">01-12</td><td class="num strong">7</td><td><span class="pill teal">Long Stay</span></td><td>Recovering</td></tr><tr><td class="num">5</td><td class="strong">Zainab Ali</td><td class="num">45</td><td>Female</td><td>Lagos</td><td>Asthma</td><td>Emergency</td><td class="num">01-15</td><td class="num strong">2</td><td><span class="pill gold">Short Stay</span></td><td>Recovered</td></tr><tr><td class="num">6</td><td class="strong">Tunde Adeyemi</td><td class="num">39</td><td>Male</td><td>Ibadan</td><td>Malaria</td><td>Emergency</td><td class="num">01-18</td><td class="num strong">3</td><td><span class="pill gold">Short Stay</span></td><td>Recovered</td></tr><tr><td class="num">7</td><td class="strong">Grace Eze</td><td class="num">68</td><td>Female</td><td>Enugu</td><td>Hypertension</td><td>Scheduled</td><td class="num">01-20</td><td class="num strong">8</td><td><span class="pill teal">Long Stay</span></td><td>Recovering</td></tr><tr><td class="num">8</td><td class="strong">Ibrahim Musa</td><td class="num">23</td><td>Male</td><td>Kaduna</td><td>Typhoid</td><td>Emergency</td><td class="num">01-22</td><td class="num strong">4</td><td><span class="pill teal">Long Stay</span></td><td>Recovered</td></tr><tr><td class="num">9</td><td class="strong">Mary Johnson</td><td class="num">56</td><td>Female</td><td>Lagos</td><td>Diabetes</td><td>Scheduled</td><td class="num">01-24</td><td class="num strong">6</td><td><span class="pill teal">Long Stay</span></td><td>Recovering</td></tr><tr><td class="num">10</td><td class="strong">Samuel Obi</td><td class="num">41</td><td>Male</td><td>Port Harcourt</td><td>Asthma</td><td>Emergency</td><td class="num">01-27</td><td class="num strong">2</td><td><span class="pill gold">Short Stay</span></td><td>Recovered</td></tr></tbody>
+    </table>
+  </div>
+  <div class="two" style="margin-top:22px">
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>ID</th><th>Physician</th><th>Specialization</th><th class="num">Patients</th><th class="num">Bed-days</th><th class="num">Avg stay</th></tr></thead>
+        <tbody><tr><td class="num">1</td><td class="strong">Dr. Ade</td><td>General Medicine</td><td class="num">4</td><td class="num">20</td><td class="num strong">5.00</td></tr><tr><td class="num">3</td><td class="strong">Dr. Bello</td><td>Family Medicine</td><td class="num">3</td><td class="num">13</td><td class="num strong">4.33</td></tr><tr><td class="num">2</td><td class="strong">Dr. Musa</td><td>Internal Medicine</td><td class="num">3</td><td class="num">11</td><td class="num strong">3.67</td></tr></tbody>
+      </table>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Condition</th><th class="num">Patients</th><th class="num">Avg stay</th><th class="num">Bed-days</th></tr></thead>
+        <tbody><tr><td class="strong">Diabetes</td><td class="num">2</td><td class="num">6.50</td><td class="num">2</td></tr><tr><td class="strong">Hypertension</td><td class="num">2</td><td class="num">6.50</td><td class="num">2</td></tr><tr><td class="strong">Typhoid</td><td class="num">2</td><td class="num">4.00</td><td class="num">2</td></tr><tr><td class="strong">Malaria</td><td class="num">2</td><td class="num">3.00</td><td class="num">2</td></tr><tr><td class="strong">Asthma</td><td class="num">2</td><td class="num">2.00</td><td class="num">2</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div></section>
+
+<section id="queries"><div class="wrap">
+  <div class="shead">
+    <div><div class="num">04 — QUERY CATALOGUE</div><h2>27 queries, five task sets</h2></div>
+    <p>Each file in <code style="background:none;color:#147D7A;font-family:inherit">/sql</code> is numbered for run order and carries the expected
+    row count in a comment.</p>
+  </div>
+  <div class="qgrid"><article class="qcard"><div class="qhead"><span class="qnum">01</span><div><h3>Retrieving and filtering</h3><p>5 queries · WHERE, AND, BETWEEN, IN</p></div></div><pre><code>SELECT *
+FROM Patients
+WHERE Gender = &#x27;Female&#x27;
+  AND City = &#x27;Lagos&#x27;
+  AND Admission_Type = &#x27;Emergency&#x27;;   -- 1 row: Aisha Bello
+
+SELECT *
+FROM Patients
+WHERE Condition IN (&#x27;Diabetes&#x27;, &#x27;Hypertension&#x27;);   -- 4 rows</code></pre></article><article class="qcard"><div class="qhead"><span class="qnum">02</span><div><h3>Sorting and aggregation</h3><p>5 queries · TOP, DISTINCT, COUNT, AVG, GROUP BY</p></div></div><pre><code>SELECT TOP (3) *
+FROM Patients
+ORDER BY Length_of_Stay DESC;      -- 8, 7, 6 days
+
+SELECT CAST(AVG(Age * 1.0) AS DECIMAL(10,2)) AS Avg_Age
+FROM Patients;                     -- 44.60 (× 1.0 avoids integer division)</code></pre></article><article class="qcard"><div class="qhead"><span class="qnum">03</span><div><h3>Strings and dates</h3><p>5 queries · UPPER, LOWER, CONCAT, YEAR, MONTH, DATENAME</p></div></div><pre><code>SELECT Patient_ID,
+       Patient_Name,
+       YEAR(Admission_Date)            AS Admission_Year,
+       DATENAME(MONTH, Admission_Date) AS Admission_Month_Name
+FROM Patients;</code></pre></article><article class="qcard"><div class="qhead"><span class="qnum">04</span><div><h3>Advanced aggregation</h3><p>6 queries · HAVING, CASE, CTE, business rules</p></div></div><pre><code>WITH AgeGroup AS
+(
+    SELECT CASE WHEN Age &lt; 40 THEN &#x27;Young&#x27;
+                WHEN Age &lt; 60 THEN &#x27;Middle-aged&#x27;
+                ELSE &#x27;Senior&#x27; END AS Age_Group
+    FROM Patients
+)
+SELECT Age_Group, COUNT(*) AS PatientCount
+FROM AgeGroup
+GROUP BY Age_Group;                -- Young 4 | Middle-aged 4 | Senior 2</code></pre></article><article class="qcard"><div class="qhead"><span class="qnum">05</span><div><h3>Keys and joins</h3><p>6 queries · PRIMARY KEY, FOREIGN KEY, INNER JOIN, RANK()</p></div></div><pre><code>SELECT D.Doctor_ID,
+       D.Doctor_Name,
+       COUNT(*) AS Patient_Count
+FROM Patients AS P
+INNER JOIN Doctors AS D ON P.Doctor_ID = D.Doctor_ID
+GROUP BY D.Doctor_ID, D.Doctor_Name
+ORDER BY COUNT(*) DESC;            -- Dr. Ade, 4 patients</code></pre></article></div>
+</div></section>
+
+<div class="wrap">
+  <div class="repro" id="reproduce">
+    <div>
+      <h2>Reproduce it locally</h2>
+      <p>Any SQL Server instance from 2016 onwards, or Azure SQL. The script set is idempotent —
+      it drops and rebuilds the objects, so it can be re-run safely.</p>
+      <ol>
+        <li>Open <code style="background:none;color:#9CC2C1">sql/00_create_schema.sql</code> in SSMS and execute it.</li>
+        <li>Run <code style="background:none;color:#9CC2C1">sql/01_load_data.sql</code> (inline inserts, no file paths needed).</li>
+        <li>Execute tasks <code style="background:none;color:#9CC2C1">02 → 06</code> in order.</li>
+        <li>Optional: <code style="background:none;color:#9CC2C1">07_reporting_views.sql</code> and <code style="background:none;color:#9CC2C1">08_data_quality_checks.sql</code>.</li>
+      </ol>
+    </div>
+    <pre><code>-- verify the load (expect 3 and 10)
+SELECT COUNT(*) AS Doctors FROM dbo.Doctors;
+SELECT COUNT(*) AS Patients FROM dbo.Patients;
+
+-- the headline query
+SELECT Admission_Type,
+       CAST(AVG(Length_of_Stay * 1.0) AS DECIMAL(10,2)) AS Avg_LOS
+FROM dbo.Patients
+GROUP BY Admission_Type
+HAVING AVG(Length_of_Stay * 1.0) &gt; 4;
+
+-- Emergency | 3.00
+-- Scheduled | 6.50</code></pre>
+  </div>
+</div>
+
+<footer><div class="wrap">
+  <div>Hospital Data Analytics · SQL Server / T-SQL case study</div>
+  <div>Dataset: January 2026 teaching extract (10 admissions) · MIT licensed</div>
+</div></footer>
+</body>
+</html>

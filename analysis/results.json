@@ -1,0 +1,353 @@
+{
+  "kpi": [
+    {
+      "total_patients": 10,
+      "avg_age": 44.6,
+      "avg_los": 4.4,
+      "bed_days": 44,
+      "recovered": 6,
+      "cities": 8,
+      "conditions": 5
+    }
+  ],
+  "by_city": [
+    {
+      "City": "Lagos",
+      "patients": 3
+    },
+    {
+      "City": "Abuja",
+      "patients": 1
+    },
+    {
+      "City": "Accra",
+      "patients": 1
+    },
+    {
+      "City": "Enugu",
+      "patients": 1
+    },
+    {
+      "City": "Ibadan",
+      "patients": 1
+    },
+    {
+      "City": "Kaduna",
+      "patients": 1
+    },
+    {
+      "City": "Kano",
+      "patients": 1
+    },
+    {
+      "City": "Port Harcourt",
+      "patients": 1
+    }
+  ],
+  "by_admission_type": [
+    {
+      "Admission_Type": "Scheduled",
+      "patients": 4,
+      "avg_los": 6.5
+    },
+    {
+      "Admission_Type": "Emergency",
+      "patients": 6,
+      "avg_los": 3.0
+    }
+  ],
+  "age_group": [
+    {
+      "age_group": "Middle-aged",
+      "patients": 4
+    },
+    {
+      "age_group": "Senior",
+      "patients": 2
+    },
+    {
+      "age_group": "Young",
+      "patients": 4
+    }
+  ],
+  "by_condition": [
+    {
+      "Condition": "Asthma",
+      "patients": 2,
+      "avg_los": 2.0
+    },
+    {
+      "Condition": "Diabetes",
+      "patients": 2,
+      "avg_los": 6.5
+    },
+    {
+      "Condition": "Hypertension",
+      "patients": 2,
+      "avg_los": 6.5
+    },
+    {
+      "Condition": "Malaria",
+      "patients": 2,
+      "avg_los": 3.0
+    },
+    {
+      "Condition": "Typhoid",
+      "patients": 2,
+      "avg_los": 4.0
+    }
+  ],
+  "doctor_workload": [
+    {
+      "Doctor_ID": 1,
+      "Doctor_Name": "Dr. Ade",
+      "Specialization": "General Medicine",
+      "patients": 4,
+      "avg_los": 5.0,
+      "bed_days": 20
+    },
+    {
+      "Doctor_ID": 3,
+      "Doctor_Name": "Dr. Bello",
+      "Specialization": "Family Medicine",
+      "patients": 3,
+      "avg_los": 4.33,
+      "bed_days": 13
+    },
+    {
+      "Doctor_ID": 2,
+      "Doctor_Name": "Dr. Musa",
+      "Specialization": "Internal Medicine",
+      "patients": 3,
+      "avg_los": 3.67,
+      "bed_days": 11
+    }
+  ],
+  "stay_category": [
+    {
+      "stay_category": "Long Stay",
+      "patients": 6
+    },
+    {
+      "stay_category": "Short Stay",
+      "patients": 4
+    }
+  ],
+  "los_detail": [
+    {
+      "Patient_ID": 1,
+      "Patient_Name": "Aisha Bello",
+      "Age": 34,
+      "Gender": "Female",
+      "City": "Lagos",
+      "Condition": "Malaria",
+      "Admission_Type": "Emergency",
+      "Doctor_ID": 1,
+      "Admission_Date": "2026-01-05",
+      "Length_of_Stay": 3,
+      "Treatment_Status": "Recovered",
+      "stay_category": "Short Stay"
+    },
+    {
+      "Patient_ID": 2,
+      "Patient_Name": "Chinedu Okafor",
+      "Age": 52,
+      "Gender": "Male",
+      "City": "Abuja",
+      "Condition": "Hypertension",
+      "Admission_Type": "Scheduled",
+      "Doctor_ID": 2,
+      "Admission_Date": "2026-01-07",
+      "Length_of_Stay": 5,
+      "Treatment_Status": "Recovering",
+      "stay_category": "Long Stay"
+    },
+    {
+      "Patient_ID": 3,
+      "Patient_Name": "Fatima Yusuf",
+      "Age": 27,
+      "Gender": "Female",
+      "City": "Kano",
+      "Condition": "Typhoid",
+      "Admission_Type": "Emergency",
+      "Doctor_ID": 3,
+      "Admission_Date": "2026-01-10",
+      "Length_of_Stay": 4,
+      "Treatment_Status": "Recovered",
+      "stay_category": "Long Stay"
+    },
+    {
+      "Patient_ID": 4,
+      "Patient_Name": "David Mensah",
+      "Age": 61,
+      "Gender": "Male",
+      "City": "Accra",
+      "Condition": "Diabetes",
+      "Admission_Type": "Scheduled",
+      "Doctor_ID": 1,
+      "Admission_Date": "2026-01-12",
+      "Length_of_Stay": 7,
+      "Treatment_Status": "Recovering",
+      "stay_category": "Long Stay"
+    },
+    {
+      "Patient_ID": 5,
+      "Patient_Name": "Zainab Ali",
+      "Age": 45,
+      "Gender": "Female",
+      "City": "Lagos",
+      "Condition": "Asthma",
+      "Admission_Type": "Emergency",
+      "Doctor_ID": 2,
+      "Admission_Date": "2026-01-15",
+      "Length_of_Stay": 2,
+      "Treatment_Status": "Recovered",
+      "stay_category": "Short Stay"
+    },
+    {
+      "Patient_ID": 6,
+      "Patient_Name": "Tunde Adeyemi",
+      "Age": 39,
+      "Gender": "Male",
+      "City": "Ibadan",
+      "Condition": "Malaria",
+      "Admission_Type": "Emergency",
+      "Doctor_ID": 3,
+      "Admission_Date": "2026-01-18",
+      "Length_of_Stay": 3,
+      "Treatment_Status": "Recovered",
+      "stay_category": "Short Stay"
+    },
+    {
+      "Patient_ID": 7,
+      "Patient_Name": "Grace Eze",
+      "Age": 68,
+      "Gender": "Female",
+      "City": "Enugu",
+      "Condition": "Hypertension",
+      "Admission_Type": "Scheduled",
+      "Doctor_ID": 1,
+      "Admission_Date": "2026-01-20",
+      "Length_of_Stay": 8,
+      "Treatment_Status": "Recovering",
+      "stay_category": "Long Stay"
+    },
+    {
+      "Patient_ID": 8,
+      "Patient_Name": "Ibrahim Musa",
+      "Age": 23,
+      "Gender": "Male",
+      "City": "Kaduna",
+      "Condition": "Typhoid",
+      "Admission_Type": "Emergency",
+      "Doctor_ID": 2,
+      "Admission_Date": "2026-01-22",
+      "Length_of_Stay": 4,
+      "Treatment_Status": "Recovered",
+      "stay_category": "Long Stay"
+    },
+    {
+      "Patient_ID": 9,
+      "Patient_Name": "Mary Johnson",
+      "Age": 56,
+      "Gender": "Female",
+      "City": "Lagos",
+      "Condition": "Diabetes",
+      "Admission_Type": "Scheduled",
+      "Doctor_ID": 3,
+      "Admission_Date": "2026-01-24",
+      "Length_of_Stay": 6,
+      "Treatment_Status": "Recovering",
+      "stay_category": "Long Stay"
+    },
+    {
+      "Patient_ID": 10,
+      "Patient_Name": "Samuel Obi",
+      "Age": 41,
+      "Gender": "Male",
+      "City": "Port Harcourt",
+      "Condition": "Asthma",
+      "Admission_Type": "Emergency",
+      "Doctor_ID": 1,
+      "Admission_Date": "2026-01-27",
+      "Length_of_Stay": 2,
+      "Treatment_Status": "Recovered",
+      "stay_category": "Short Stay"
+    }
+  ],
+  "top3_los": [
+    {
+      "Patient_Name": "Grace Eze",
+      "Length_of_Stay": 8
+    },
+    {
+      "Patient_Name": "David Mensah",
+      "Length_of_Stay": 7
+    },
+    {
+      "Patient_Name": "Mary Johnson",
+      "Length_of_Stay": 6
+    }
+  ],
+  "after_15_jan": [
+    {
+      "Patient_Name": "Tunde Adeyemi",
+      "Admission_Date": "2026-01-18"
+    },
+    {
+      "Patient_Name": "Grace Eze",
+      "Admission_Date": "2026-01-20"
+    },
+    {
+      "Patient_Name": "Ibrahim Musa",
+      "Admission_Date": "2026-01-22"
+    },
+    {
+      "Patient_Name": "Mary Johnson",
+      "Admission_Date": "2026-01-24"
+    },
+    {
+      "Patient_Name": "Samuel Obi",
+      "Admission_Date": "2026-01-27"
+    }
+  ],
+  "internal_medicine": [
+    {
+      "Patient_Name": "Chinedu Okafor",
+      "Specialization": "Internal Medicine",
+      "Doctor_Name": "Dr. Musa"
+    },
+    {
+      "Patient_Name": "Ibrahim Musa",
+      "Specialization": "Internal Medicine",
+      "Doctor_Name": "Dr. Musa"
+    },
+    {
+      "Patient_Name": "Zainab Ali",
+      "Specialization": "Internal Medicine",
+      "Doctor_Name": "Dr. Musa"
+    }
+  ],
+  "gender_status": [
+    {
+      "Gender": "Female",
+      "Treatment_Status": "Recovered",
+      "patients": 3
+    },
+    {
+      "Gender": "Female",
+      "Treatment_Status": "Recovering",
+      "patients": 2
+    },
+    {
+      "Gender": "Male",
+      "Treatment_Status": "Recovered",
+      "patients": 3
+    },
+    {
+      "Gender": "Male",
+      "Treatment_Status": "Recovering",
+      "patients": 2
+    }
+  ]
+}

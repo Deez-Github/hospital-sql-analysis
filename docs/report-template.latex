@@ -1,0 +1,139 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage{fontspec}
+\setmainfont{Lato}
+\setsansfont{Lato}
+\newfontfamily\displayfont{EBGaramond12}[Path=/usr/share/fonts/truetype/ebgaramond/,Extension=.ttf,UprightFont=*-Regular,BoldFont=*-Bold,ItalicFont=*-Italic,BoldItalicFont=*-Bold]
+\newfontfamily\monofont{DejaVu Sans Mono}[Scale=0.82]
+
+\usepackage[a4paper,top=26mm,bottom=24mm,left=22mm,right=22mm,headsep=9mm]{geometry}
+\usepackage{xcolor}
+\definecolor{ink}{HTML}{0B2027}
+\definecolor{slate}{HTML}{5C6B73}
+\definecolor{teal}{HTML}{147D7A}
+\definecolor{tealfaint}{HTML}{EDF5F4}
+\definecolor{gold}{HTML}{C08A2E}
+\definecolor{coral}{HTML}{D96C5F}
+\definecolor{rulegrey}{HTML}{DCD9D1}
+
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{float}
+\floatplacement{figure}{htbp}
+\usepackage[most]{tcolorbox}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{ragged2e}
+\providecommand{\pandocbounded}[1]{#1}
+\providecommand{\pandocbounded}[1]{#1}
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\providecommand{\passthrough}[1]{#1}
+
+\linespread{1.12}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{7pt}
+\setlist{itemsep=3pt,topsep=4pt,leftmargin=1.3em}
+
+% ---------- headings -------------------------------------------------
+\titleformat{\section}
+  {\displayfont\fontsize{20}{24}\selectfont\bfseries\color{ink}}
+  {\color{teal}\thesection\hspace{9pt}}{0pt}{}
+  [\vspace{-4pt}{\color{teal}\rule{\textwidth}{0.7pt}}]
+\titlespacing*{\section}{0pt}{20pt}{12pt}
+
+\titleformat{\subsection}
+  {\sffamily\fontsize{11.5}{14}\selectfont\bfseries\color{teal}}
+  {\thesubsection\hspace{7pt}}{0pt}{}
+\titlespacing*{\subsection}{0pt}{14pt}{4pt}
+
+% ---------- header / footer ------------------------------------------
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{\color{rulegrey}\hrule height 0.4pt}
+\fancyhead[L]{\sffamily\footnotesize\color{slate}Hospital Admissions Analytics}
+\fancyhead[R]{\sffamily\footnotesize\color{slate}SQL Server \textperiodcentered{} T-SQL}
+\fancyfoot[L]{\sffamily\footnotesize\color{slate}Amandi Delight Chukwuebuka}
+\fancyfoot[R]{\sffamily\footnotesize\color{slate}\thepage}
+
+% ---------- quotes as callouts ---------------------------------------
+\renewenvironment{quote}
+  {\begin{tcolorbox}[enhanced, colback=tealfaint, colframe=tealfaint, boxrule=0pt,
+     borderline west={3pt}{0pt}{teal}, arc=0pt, left=10pt, right=10pt, top=7pt, bottom=7pt,
+     before skip=10pt, after skip=10pt]
+   \small\color{ink}\setlength{\parskip}{3pt}}
+  {\end{tcolorbox}}
+
+% ---------- code ------------------------------------------------------
+\definecolor{shadecolor}{HTML}{F4F3EE}
+\usepackage{listings}
+\lstset{
+  basicstyle=\ttfamily\footnotesize\color{ink},
+  backgroundcolor=\color{shadecolor},
+  keywordstyle=\color{teal}\bfseries,
+  commentstyle=\color{slate}\itshape,
+  stringstyle=\color{gold},
+  breaklines=true, columns=fullflexible, keepspaces=true, showstringspaces=false,
+  frame=none, framexleftmargin=8pt, xleftmargin=8pt, framexrightmargin=8pt,
+  aboveskip=10pt, belowskip=10pt, extendedchars=true
+}
+
+% ---------- tables ----------------------------------------------------
+\renewcommand{\arraystretch}{1.28}
+\AtBeginEnvironment{longtable}{\small}
+
+% ---------- caption ---------------------------------------------------
+\usepackage[font={small},labelfont={bf,sf,color=teal},textfont={color=slate},skip=6pt]{caption}
+
+\begin{document}
+\thispagestyle{empty}
+
+% ======================= COVER ======================================
+\begin{titlepage}
+\raggedright
+\vspace*{2mm}
+{\color{teal}\rule{\textwidth}{3pt}}
+\vspace{5mm}
+
+{\sffamily\footnotesize\bfseries\color{teal}SQL SERVER 17.0 \textperiodcentered{} T-SQL \textperiodcentered{} JANUARY 2026 EXTRACT\par}
+
+\vspace{38mm}
+{\displayfont\fontsize{40}{44}\selectfont\bfseries\color{ink}
+ Hospital Admissions\\[2pt] Analytics\par}
+
+\vspace{7mm}
+{\displayfont\itshape\fontsize{15.5}{21}\selectfont\color{slate}
+ A SQL Server case study of ten January admissions —\\
+ and what the numbers imply for capacity\par}
+
+\vspace{12mm}
+{\color{rulegrey}\rule{\textwidth}{0.6pt}}
+\vspace{4mm}
+
+\begin{tabular}{@{}p{0.28\textwidth}p{0.66\textwidth}@{}}
+\sffamily\footnotesize\color{slate}Prepared by & \sffamily\footnotesize\color{ink}Amandi Delight Chukwuebuka \\[5pt]
+\sffamily\footnotesize\color{slate}Dataset & \sffamily\footnotesize\color{ink}10 admissions · 3 physicians · 5–27 January 2026 \\[5pt]
+\sffamily\footnotesize\color{slate}Engine & \sffamily\footnotesize\color{ink}Microsoft SQL Server 17.0 (T-SQL) \\[5pt]
+\sffamily\footnotesize\color{slate}Scope & \sffamily\footnotesize\color{ink}27 queries · 5 reporting views · 8 validation checks \\[5pt]
+\sffamily\footnotesize\color{slate}Date & \sffamily\footnotesize\color{ink}November 2026 \\
+\end{tabular}
+
+\vfill
+{\color{teal}\rule{\textwidth}{0.8pt}}
+\vspace{2mm}
+{\sffamily\scriptsize\color{slate}
+ EXECUTIVE SUMMARY\hspace{6pt}\textperiodcentered\hspace{6pt}SCHEMA \& METHOD\hspace{6pt}\textperiodcentered\hspace{6pt}
+ TASK RESULTS\hspace{6pt}\textperiodcentered\hspace{6pt}FINDINGS\hspace{6pt}\textperiodcentered\hspace{6pt}
+ RECOMMENDATIONS\hspace{6pt}\textperiodcentered\hspace{6pt}APPENDIX\par}
+
+\end{titlepage}
+
+% ======================= BODY =======================================
+$body$
+
+\end{document}
